@@ -1,5 +1,5 @@
 asyncio==4.0.0
 fastmcp==2.12.3
 python-docx==1.2.0
-Spire.Doc==13.8.0
+Spire.Doc
 plum-dispatch==1.7.4
