@@ -3,13 +3,12 @@ import os
 import tempfile
 
 from docx import Document
-from docx.shared import Inches
 from fastmcp import FastMCP
-from spire.doc import Document
-from spire.doc.common import FileForm
+from spire.doc import *
+from spire.doc.common import *
 
 # Create an MCP server with a descriptive name
-mcp = FastMCP("Word Document Master 📄")
+mcp = FastMCP("Word Document Master")
 
 
 # --- Helper Function ---
