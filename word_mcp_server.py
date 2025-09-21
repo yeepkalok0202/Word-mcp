@@ -5,6 +5,8 @@ import tempfile
 from docx import Document
 from docx.shared import Inches
 from fastmcp import FastMCP
+from spire.doc import Document
+from spire.doc.common import FileForm
 
 # Create an MCP server with a descriptive name
 mcp = FastMCP("Word Document Master 📄")
@@ -84,31 +86,6 @@ def add_heading(filename: str, text: str, level: int = 1) -> str:
     except Exception as e:
         return f"Error adding heading to '{filename}': {e}"
 
-
-@mcp.tool()
-def add_picture(filename: str, image_path: str, width_inches: float = 2.5) -> str:
-    """
-    Adds a picture to a Word document. NOTE: The image_path must exist on the server.
-
-    Args:
-        filename: The name of the document.
-        image_path: The path to the image file on the server.
-        width_inches: The desired width of the image in inches.
-
-    Returns:
-        A success message.
-    """
-    safe_path = get_safe_filepath(filename)  # Use the helper
-    try:
-        document = Document(safe_path)
-        # This assumes the image file also exists on the server
-        document.add_picture(image_path, width=Inches(width_inches))
-        document.save(safe_path)
-        return f"Picture added to '{filename}'."
-    except Exception as e:
-        return f"Error adding picture to '{filename}': {e}"
-
-
 @mcp.tool()
 def download_document(filename: str) -> str:
     """
@@ -133,6 +110,30 @@ def download_document(filename: str) -> str:
     except Exception as e:
         return f"Error downloading '{filename}': {e}"
 
+@mcp.tool()
+def convert_to_pdf(filename: str) -> str:
+    """
+    Converts a Word document to a PDF file on the server using Spire.Doc.
+    
+    Args:
+        filename: The name of the Word document to convert (e.g., 'mydocument.docx').
+    
+    Returns:
+        A success message with the new PDF filename, or an error message if conversion fails.
+    """
+    docx_path = get_safe_filepath(filename)
+    pdf_path = docx_path.replace('.docx', '.pdf')
+    if docx_path == pdf_path:
+        pdf_path += '.pdf'
+    document = Document()
+    try:
+        document.LoadFromFile(docx_path)
+        document.SaveToFile(pdf_path, FileFormat.PDF)
+        return f"Document '{filename}' successfully converted to '{os.path.basename(pdf_path)}'."
+    except Exception as e:
+        return f"Error converting '{filename}' to PDF: {e}"
+    finally:
+        document.Close()
 
 if __name__ == "__main__":
     mcp.run()
